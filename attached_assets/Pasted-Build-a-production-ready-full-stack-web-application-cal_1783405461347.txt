@@ -1,0 +1,448 @@
+Build a production-ready full-stack web application called "IntelliDocs AI".
+
+IntelliDocs AI is an AI-powered Knowledge Assistant that allows users to upload documents and chat with them using natural language.
+
+The platform should NOT contain dummy data.
+
+Every user must be able to create an account, verify their email, log in securely, upload their own documents, and access only their own files and chat history.
+
+Use real authentication and a real database.
+
+-------------------------------------------------
+
+Tech Stack
+
+Frontend
+- React 19
+- Vite
+- TypeScript
+- Tailwind CSS
+- React Router
+- React Hook Form
+- Framer Motion
+- TanStack Query
+- Heroicons
+
+Backend
+- Node.js
+- Express
+
+Database
+- Supabase PostgreSQL
+
+Authentication
+- Supabase Authentication
+- Email & Password
+- Google Login
+- Forgot Password
+- Email Verification
+
+AI
+- Google Gemini API
+
+File Storage
+- Supabase Storage
+
+-------------------------------------------------
+
+The application should have a premium UI inspired by Notion AI, ChatGPT, Linear, Perplexity AI and Google Gemini.
+
+Use
+
+Glassmorphism
+
+Rounded cards
+
+Dark Mode
+
+Light Mode
+
+Smooth animations
+
+Professional sidebar
+
+Loading skeletons
+
+Beautiful typography
+
+Responsive design
+
+Modern dashboard
+
+-------------------------------------------------
+
+Landing Page
+
+Hero Section
+
+Features
+
+How It Works
+
+Benefits
+
+Pricing
+
+FAQ
+
+Contact
+
+Login
+
+Register
+
+-------------------------------------------------
+
+Authentication
+
+User Registration
+
+Secure Login
+
+Google Login
+
+Forgot Password
+
+Email Verification
+
+User Profile
+
+Logout
+
+-------------------------------------------------
+
+Dashboard
+
+Welcome message
+
+Total Uploaded Documents
+
+AI Conversations
+
+Recent Documents
+
+Recent Chats
+
+Storage Usage
+
+Quick Actions
+
+Recent Activity
+
+-------------------------------------------------
+
+Document Management
+
+Upload
+
+PDF
+
+DOCX
+
+TXT
+
+Drag and Drop Upload
+
+Upload Progress
+
+Document Preview
+
+Rename
+
+Delete
+
+Search Documents
+
+Filter Documents
+
+Document Size
+
+Upload Date
+
+-------------------------------------------------
+
+AI Knowledge Assistant
+
+The core feature.
+
+Users can open any uploaded document and chat with it.
+
+Examples
+
+"Summarize this PDF."
+
+"What are the important topics?"
+
+"Explain Chapter 3."
+
+"What are the key findings?"
+
+"Generate interview questions."
+
+"Create study notes."
+
+"Translate this."
+
+"Explain in simple language."
+
+The AI must answer using only the uploaded document.
+
+-------------------------------------------------
+
+AI Features
+
+Document Summary
+
+Key Points
+
+Chapter Summary
+
+Study Notes
+
+Flashcards
+
+Quiz Generator
+
+Question Generator
+
+Definitions
+
+Important Dates
+
+Important Formulas
+
+Important Concepts
+
+Mind Map Suggestions
+
+Exam Preparation
+
+Interview Questions
+
+Action Items
+
+Meeting Minutes
+
+Document Translation
+
+Explain Like I'm 10
+
+Generate FAQs
+
+-------------------------------------------------
+
+Chat Features
+
+ChatGPT-like interface
+
+Streaming AI responses
+
+Markdown Support
+
+Copy Response
+
+Regenerate Response
+
+Delete Chat
+
+Rename Chat
+
+Chat History
+
+Recent Chats
+
+-------------------------------------------------
+
+Search
+
+Global Search
+
+Search Documents
+
+Search Conversations
+
+Search AI Answers
+
+-------------------------------------------------
+
+User Workspace
+
+Every user has their own workspace.
+
+Users must NEVER see another user's documents.
+
+Users must NEVER access another user's chats.
+
+Use Supabase Row Level Security.
+
+-------------------------------------------------
+
+Database Tables
+
+profiles
+
+documents
+
+document_chunks
+
+conversations
+
+messages
+
+flashcards
+
+quizzes
+
+notes
+
+bookmarks
+
+favorites
+
+-------------------------------------------------
+
+Supabase Storage
+
+Store uploaded documents securely.
+
+Each user can only access their own uploaded files.
+
+-------------------------------------------------
+
+Backend APIs
+
+Authentication
+
+Upload Document
+
+Delete Document
+
+Get Documents
+
+AI Chat
+
+Generate Notes
+
+Generate Flashcards
+
+Generate Quiz
+
+Generate Summary
+
+Search Documents
+
+-------------------------------------------------
+
+Settings
+
+Profile
+
+Dark Mode
+
+Language
+
+Notification Preferences
+
+Delete Account
+
+-------------------------------------------------
+
+Security
+
+Row Level Security
+
+JWT Authentication
+
+Input Validation
+
+Protected Routes
+
+Secure API
+
+Environment Variables
+
+Rate Limiting
+
+-------------------------------------------------
+
+Performance
+
+Lazy Loading
+
+Pagination
+
+Infinite Scroll
+
+Caching
+
+Optimized API Calls
+
+-------------------------------------------------
+
+Project Structure
+
+Use clean architecture.
+
+Separate
+
+Components
+
+Pages
+
+Hooks
+
+Services
+
+Contexts
+
+API
+
+Utilities
+
+Types
+
+-------------------------------------------------
+
+Generate
+
+Complete React Frontend
+
+Complete Express Backend
+
+Complete Supabase SQL Schema
+
+Complete Authentication
+
+Supabase Storage Integration
+
+Gemini API Integration
+
+README
+
+.env.example
+
+Supabase Setup Guide
+
+Gemini Setup Guide
+
+Deployment Guide
+
+-------------------------------------------------
+
+The application should work immediately after adding
+
+SUPABASE_URL
+
+SUPABASE_ANON_KEY
+
+SUPABASE_SERVICE_ROLE_KEY
+
+GEMINI_API_KEY
+
+Do not use dummy data.
+
+Do not use fake users.
+
+Do not use static JSON.
+
+Everything must work using Supabase and Gemini API.
