@@ -1,0 +1,1 @@
+- [IntelliDocs Supabase setup](intellidocs-supabase.md) — Supabase client uses service role key in backend; frontend env vars injected via Vite define from secrets; pdf-parse/mammoth externalized from esbuild bundle.

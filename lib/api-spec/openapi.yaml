@@ -3,20 +3,31 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: IntelliDocs AI API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: documents
+    description: Document management
+  - name: conversations
+    description: Conversation management
+  - name: messages
+    description: Chat messages
+  - name: ai
+    description: AI generation features
+  - name: dashboard
+    description: Dashboard statistics
+  - name: profile
+    description: User profile
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +35,354 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /documents:
+    get:
+      operationId: listDocuments
+      tags: [documents]
+      summary: List user documents
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Document list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentList"
+    post:
+      operationId: uploadDocument
+      tags: [documents]
+      summary: Upload a document (multipart/form-data; handled via direct fetch)
+      responses:
+        "201":
+          description: Document uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+
+  /documents/{id}:
+    get:
+      operationId: getDocument
+      tags: [documents]
+      summary: Get document details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+    patch:
+      operationId: updateDocument
+      tags: [documents]
+      summary: Rename or update a document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentUpdate"
+      responses:
+        "200":
+          description: Updated document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+    delete:
+      operationId: deleteDocument
+      tags: [documents]
+      summary: Delete a document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResult"
+
+  /conversations:
+    get:
+      operationId: listConversations
+      tags: [conversations]
+      summary: List user conversations
+      parameters:
+        - name: documentId
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Conversation list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationList"
+    post:
+      operationId: createConversation
+      tags: [conversations]
+      summary: Create a new conversation for a document
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConversationInput"
+      responses:
+        "201":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+
+  /conversations/{id}:
+    get:
+      operationId: getConversation
+      tags: [conversations]
+      summary: Get conversation with messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationWithMessages"
+    patch:
+      operationId: updateConversation
+      tags: [conversations]
+      summary: Rename a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConversationUpdate"
+      responses:
+        "200":
+          description: Updated conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+    delete:
+      operationId: deleteConversation
+      tags: [conversations]
+      summary: Delete a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResult"
+
+  /conversations/{id}/chat:
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      summary: Send a message and get AI response
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageInput"
+      responses:
+        "200":
+          description: AI response message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+
+  /conversations/{id}/messages/{messageId}:
+    delete:
+      operationId: deleteMessage
+      tags: [messages]
+      summary: Delete a message
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResult"
+
+  /ai/generate:
+    post:
+      operationId: generateAiContent
+      tags: [ai]
+      summary: Generate AI content (summary, flashcards, quiz, notes, etc.)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiGenerateInput"
+      responses:
+        "200":
+          description: Generated content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiGenerateResult"
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard overview statistics
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/recent-activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Get recent activity feed
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecentActivityList"
+
+  /profile:
+    get:
+      operationId: getProfile
+      tags: [profile]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+    patch:
+      operationId: updateProfile
+      tags: [profile]
+      summary: Update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+
+  /profile/delete-account:
+    delete:
+      operationId: deleteAccount
+      tags: [profile]
+      summary: Delete the user's account
+      responses:
+        "200":
+          description: Account deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResult"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +390,319 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        fileType:
+          type: string
+        fileSize:
+          type: integer
+        storagePath:
+          type: string
+        publicUrl:
+          type: ["string", "null"]
+        pageCount:
+          type: ["integer", "null"]
+        status:
+          type: string
+          enum: [pending, processing, ready, error]
+        conversationCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        [id, userId, name, fileType, fileSize, storagePath, status, createdAt, updatedAt]
+
+    DocumentList:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: "#/components/schemas/Document"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required: [documents, total, page, limit]
+
+    DocumentUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        documentId:
+          type: string
+        documentName:
+          type: ["string", "null"]
+        title:
+          type: string
+        messageCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, userId, documentId, title, messageCount, createdAt, updatedAt]
+
+    ConversationList:
+      type: object
+      properties:
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Conversation"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required: [conversations, total, page, limit]
+
+    ConversationInput:
+      type: object
+      properties:
+        documentId:
+          type: string
+        title:
+          type: string
+      required: [documentId]
+
+    ConversationUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        conversationId:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, conversationId, role, content, createdAt]
+
+    ConversationWithMessages:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        documentId:
+          type: string
+        documentName:
+          type: ["string", "null"]
+        title:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, userId, documentId, title, messages, createdAt, updatedAt]
+
+    MessageInput:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 1
+      required: [content]
+
+    ChatResponse:
+      type: object
+      properties:
+        userMessage:
+          $ref: "#/components/schemas/Message"
+        assistantMessage:
+          $ref: "#/components/schemas/Message"
+      required: [userMessage, assistantMessage]
+
+    AiGenerateInput:
+      type: object
+      properties:
+        documentId:
+          type: string
+        featureType:
+          type: string
+          enum:
+            [
+              summary,
+              keyPoints,
+              chapterSummary,
+              studyNotes,
+              flashcards,
+              quiz,
+              questionGenerator,
+              definitions,
+              importantDates,
+              importantFormulas,
+              importantConcepts,
+              mindMap,
+              examPrep,
+              interviewQuestions,
+              actionItems,
+              meetingMinutes,
+              translate,
+              explainSimply,
+              generateFaqs,
+            ]
+        additionalContext:
+          type: string
+      required: [documentId, featureType]
+
+    AiGenerateResult:
+      type: object
+      properties:
+        featureType:
+          type: string
+        content:
+          type: string
+        documentId:
+          type: string
+      required: [featureType, content, documentId]
+
+    DashboardStats:
+      type: object
+      properties:
+        totalDocuments:
+          type: integer
+        totalConversations:
+          type: integer
+        totalMessages:
+          type: integer
+        storageUsedBytes:
+          type: integer
+        storageUsedMb:
+          type: number
+        recentDocuments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Document"
+        recentConversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Conversation"
+      required:
+        [
+          totalDocuments,
+          totalConversations,
+          totalMessages,
+          storageUsedBytes,
+          storageUsedMb,
+          recentDocuments,
+          recentConversations,
+        ]
+
+    ActivityItem:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [document_uploaded, conversation_started, message_sent, ai_generated]
+        description:
+          type: string
+        resourceId:
+          type: string
+        resourceName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, type, description, createdAt]
+
+    RecentActivityList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityItem"
+      required: [items]
+
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        fullName:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        preferredLanguage:
+          type: string
+        darkMode:
+          type: boolean
+        emailNotifications:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, email, darkMode, emailNotifications, createdAt]
+
+    ProfileUpdate:
+      type: object
+      properties:
+        fullName:
+          type: string
+        preferredLanguage:
+          type: string
+        darkMode:
+          type: boolean
+        emailNotifications:
+          type: boolean
+
+    DeleteResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success]

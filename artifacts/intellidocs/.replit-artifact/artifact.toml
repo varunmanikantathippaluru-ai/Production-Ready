@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "IntelliDocs AI"
+version = "1.0.0"
+id = "artifacts/intellidocs"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26174
+
+[services.development]
+run = "pnpm --filter @workspace/intellidocs run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/intellidocs", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/intellidocs/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26174"
+BASE_PATH = "/"
