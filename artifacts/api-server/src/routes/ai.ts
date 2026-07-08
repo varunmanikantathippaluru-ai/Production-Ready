@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { supabase } from "../lib/supabase.js";
 import { getGeminiModel, buildFeaturePrompt } from "../lib/gemini.js";
+import { extractText } from "../lib/textExtractor.js";
 import { requireAuth, type AuthRequest } from "../middlewares/auth.js";
 
 const router = Router();
@@ -16,10 +17,10 @@ router.post("/ai/generate", requireAuth, async (req: AuthRequest, res) => {
       return;
     }
 
-    // Get document
+    // Fetch document including storage_path and content
     const { data: doc, error: docError } = await supabase
       .from("documents")
-      .select("id, name, content")
+      .select("id, name, content, storage_path, file_size")
       .eq("id", documentId)
       .eq("user_id", userId)
       .single();
@@ -29,11 +30,57 @@ router.post("/ai/generate", requireAuth, async (req: AuthRequest, res) => {
       return;
     }
 
-    const docContent = (doc as Record<string, unknown>)["content"] as string || "";
     const docName = (doc as Record<string, unknown>)["name"] as string || "document";
+    let docContent = (doc as Record<string, unknown>)["content"] as string || "";
 
-    if (!docContent) {
-      res.status(422).json({ error: "Document content could not be extracted. Please ensure the file is readable." });
+    // Auto-heal: if content is empty (uploaded before text-extraction fix),
+    // download the file from storage, re-extract, and persist to DB.
+    if (!docContent.trim()) {
+      const storagePath = (doc as Record<string, unknown>)["storage_path"] as string | null;
+      if (storagePath) {
+        req.log.info({ documentId, storagePath }, "Content empty — re-extracting from storage");
+        try {
+          const { data: fileData, error: dlError } = await supabase.storage
+            .from("documents")
+            .download(storagePath);
+
+          if (!dlError && fileData) {
+            const ext = storagePath.split(".").pop()?.toLowerCase() ?? "";
+            const mimeMap: Record<string, string> = {
+              pdf: "application/pdf",
+              docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+              txt: "text/plain",
+              md: "text/plain",
+            };
+            const mimeType = mimeMap[ext] ?? "application/octet-stream";
+            const arrayBuf = await fileData.arrayBuffer();
+            const buffer = Buffer.from(arrayBuf);
+            const extracted = await extractText(buffer, mimeType, storagePath);
+
+            if (extracted.trim()) {
+              docContent = extracted;
+              // Persist so future requests don't need to re-extract
+              await supabase
+                .from("documents")
+                .update({ content: extracted })
+                .eq("id", documentId)
+                .eq("user_id", userId);
+              req.log.info({ documentId, chars: extracted.length }, "Re-extraction succeeded");
+            }
+          }
+        } catch (reExtractErr) {
+          req.log.error({ reExtractErr }, "Re-extraction failed");
+        }
+      }
+    }
+
+    if (!docContent.trim()) {
+      res.status(422).json({
+        error:
+          "This document has no extractable text. " +
+          "If it is a scanned PDF (image-only), AI features cannot be used. " +
+          "Try re-uploading a text-based PDF or a DOCX file.",
+      });
       return;
     }
 

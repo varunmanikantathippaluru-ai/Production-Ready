@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { toast } from "sonner";
 import { 
   useGetDocument, 
   useGenerateAiContent, 
@@ -66,8 +67,11 @@ export default function DocumentDetail({ id }: { id: string }) {
         data: { documentId: id, featureType }
       });
       setActiveContent({ title, content: res.content });
-    } catch (error) {
-      console.error(error);
+    } catch (error: unknown) {
+      const msg = (error as { data?: { error?: string }; message?: string })?.data?.error
+        || (error as Error)?.message
+        || "Failed to generate content. Please try again.";
+      toast.error(msg);
     }
   };
 
