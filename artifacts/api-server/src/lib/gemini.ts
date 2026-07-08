@@ -6,7 +6,7 @@ if (!geminiKey) throw new Error("GEMINI_API_KEY must be set");
 const genAI = new GoogleGenerativeAI(geminiKey);
 
 export function getGeminiModel() {
-  return genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  return genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
 }
 
 export function buildDocumentSystemPrompt(documentContent: string, documentName: string): string {
